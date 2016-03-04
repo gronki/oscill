@@ -69,6 +69,7 @@
     if render then begin ;;;;;;;;;;;;;;;;;;;;
         set_plot, 'Z'
         device, z_buf = 0, decomposed = 1, set_resolution = [1600,900], set_pixel_depth = 24
+        mk_dir, 'png'
     endif else begin
         set_plot, 'X'
 
