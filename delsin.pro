@@ -1,3 +1,5 @@
+    @colorr
+
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     render = 1
@@ -11,15 +13,13 @@
     s = 0.4 * !pi / 3.
     p = 5.0 * !pi / 3
 
-    npoints = 8000
-    
+
     fps = 24
     nrefl = 8
     refltime = 12
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    @colorr
 
     set_plot,'X'
 
@@ -29,6 +29,9 @@
 
     device, decomp=1
 
+
+    nstat = round(max([80,12*p*a / (hbar*!pi)]))
+    npoints = 8*nstat
 
     x = (dindgen(npoints)/(npoints-1.) - 0.5)*a
     dx = x(1) - x(0)
@@ -40,7 +43,6 @@
 
     rang = 0.707 * max(abs(f))
 
-    nstat = round(max([80,24*p*a / (hbar*!pi)])) ;round(p*5)
 
     print, 'states: ', nstat
     print, 'points: ', npoints
