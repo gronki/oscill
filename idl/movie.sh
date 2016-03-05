@@ -4,7 +4,6 @@ set -e
 
 PREFX=$1
 
-mkdir -p png
 mkdir -p mpeg
 
 LISTF=$(ls png/* | grep "png\/${PREFX}-1[0-9]*\.png")
