@@ -137,7 +137,8 @@
         if (systime(/sec) - t_msg) gt 30. then begin
             t_elapsed = systime(/sec) - t_start
              print,n_elements(t)-1-i, '   left: ',  $
-                string(1. * t_elapsed / (i+1) * ( n_elements(t)-1 -i) / 60., f='(f0.1)') + ' min'
+                string(1. * t_elapsed / (i+1) * ( n_elements(t)-1 -i) / 60., f='(f0.1)') + ' min ', $
+                ' (' + systime(0,t_start + t_elapsed / (i+1) * n_elements(t)) ')'
             t_msg = systime(/sec)
         endif
     endfor
