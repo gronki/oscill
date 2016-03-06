@@ -2,22 +2,22 @@
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    render = 0
-    pref = 'slow2'
+    render = 1
+    pref = 'slow4'
 
-    m = 1.
+    m = 5.
     hbar = 1.
 
-    a = 25.
-	x0 = -a/4.
-    s = 0.03*a
-    p = hbar*m
+    a = 1.
+	x0 = 0
+    s = 0.06
+    p = m * 2
 
 
     fps = 24
-    nrefl = 4
-    refltime = 36
-    rang_corr = 0.4
+    nrefl = 6
+    refltime = 20
+    rang_corr = 0.8
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -31,7 +31,7 @@
     device, decomp=1
 
 
-    nstat = round(max([80,12*p*a / (hbar*!pi)]))
+    nstat = round(max([80,4*p*a / (hbar*!pi)]))
     npoints = 8*nstat
 
     x = (dindgen(npoints)/(npoints-1.) - 0.5)*a
@@ -88,11 +88,18 @@
     dt = t(1) - t(0)
 
     ntr = round((tscal*2)/dt)
-    trmarg = round(ntr * 0.08)
+    trmarg = round(ntr / 9.)
+    mmm = rebin(reform(findgen(trmarg),[1,trmarg]),[npoints,trmarg],/samp)
+    mmm = exp( -(mmm-trmarg/2.) ^ 2. / ( 2 * (trmarg/4.)^2 ) )
+    mmm[*,0] = 1.
+
     im0 = fltarr(npoints,ntr+trmarg)
     im1 = fltarr(npoints,ntr+trmarg)
 
     white = rgb(255,255,255)
+
+    t_start = systime(/sec)
+    t_msg = t_start
 
     for i=0l, n_elements(t)-1 do begin
         ar1 = reform(spec*exp(t(i)*en/hbar*j),[1,nstat])
@@ -108,9 +115,6 @@
         plot,x,real_part(y),yr=[-1,1]*rang, thick=2, color=rgb(255,255,255), ystyle=1, xstyle=1
         oplot, x, imaginary(y), color=rgb(255, 80, 33), thick=2
 
-        mmm = rebin(reform(findgen(trmarg),[1,trmarg]),[npoints,trmarg],/samp)
-        mmm = exp( -(mmm-trmarg/2.) ^ 2. / ( 2 * (trmarg/4.)^2 ) )
-        mmm[*,0] = 1.
 
         if render ne 0 then begin
             im0 = shift(temporary(im0),0,-1)
@@ -120,9 +124,9 @@
             im1(*,ntr:ntr+trmarg-1) = rebin(ph,[npoints,trmarg],/samp)
 
             plot_image, rgbflip(bytscl(mono2rgb(im0), min=0, max=rang^2)), color=white,   $
-                    /nosq, min=0, max=255,  scale=[dx,dt], origin=[0,t(i)-ntr*dt]
+                    /nosq, min=0, max=255,  scale=[dx,dt], origin=[x(0),t(i)-ntr*dt]
             plot_image, rgbflip( 1l * rainbow(im1) * mono2rgb(bytscl(im0,min=0, max=rang^2)) / 255. ),$
-                    color=white, /nosq, min=0, max=255,  scale=[dx,dt], origin=[0,t(i)-ntr*dt]
+                    color=white, /nosq, min=0, max=255,  scale=[dx,dt], origin=[x(0),t(i)-ntr*dt]
 
             write_png, 'png/' + pref + '-' + string(1000000l+i,f='(I0)') + '.png', tvrd(/true)
         endif else begin
@@ -130,7 +134,12 @@
         endelse
 
 
-        if ((n_elements(t)-1-i) mod 50) eq 0 then print,n_elements(t)-1-i
+        if (systime(/sec) - t_msg) gt 30. then begin
+            t_elapsed = systime(/sec) - t_start
+             print,n_elements(t)-1-i, '   left: ',  $
+                string(1. * t_elapsed / (i+1) * ( n_elements(t)-1 -i) / 60., f='(f0.1)') + ' min'
+            t_msg = systime(/sec)
+        endif
     endfor
 
 end
