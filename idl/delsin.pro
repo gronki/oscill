@@ -44,6 +44,7 @@
 
     rang = rang_corr * 0.707 * max(abs(f))
 
+    print, 'NAME ', pref
 
     print, 'states: ', nstat
     print, 'points: ', npoints
