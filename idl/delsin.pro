@@ -144,4 +144,6 @@
         endif
     endfor
 
+    print, 'FINISHED ', pref
+
 end
