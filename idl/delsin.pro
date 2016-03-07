@@ -4,6 +4,7 @@
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     render = 1
 
+
     pref = 'stat'
     m = 5.
     hbar = 1.
@@ -19,7 +20,6 @@
     nrefl = 0.04
     refltime = 10000.
     rang_corr = 0.5
-
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -83,10 +83,11 @@
 
     if render eq 0 then fps=fps/2
 
-    tscal = a * m / p
+    tscal = a * m / (p > (hbar*!pi/a) )
+    tmax = nrefl * tscal
     tbins = nrefl * refltime * fps
     print, 'time bins: ', tbins
-    t = findgen(tbins)/(tbins-1.) * nrefl * tscal
+    t = findgen(tbins)/(tbins-1.) * tmax
     dt = t(1) - t(0)
 
     ntr = round((tscal*2)/dt)
@@ -139,9 +140,12 @@
         if (systime(/sec) - t_msg) gt 30. then begin
             t_elapsed = systime(/sec) - t_start
              print,n_elements(t)-1-i, '   left: ',  $
-                string(1. * t_elapsed / (i+1) * ( n_elements(t)-1 -i) / 60., f='(f0.1)') + ' min'
+                string(1. * t_elapsed / (i+1) * ( n_elements(t)-1 -i) / 60., f='(f0.1)') + ' min ', $
+                ' (' + systime(0,t_start + t_elapsed / (i+1) * n_elements(t)) +')'
             t_msg = systime(/sec)
         endif
     endfor
+
+    print, 'FINISHED ', pref
 
 end

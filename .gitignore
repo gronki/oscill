@@ -1,6 +1,5 @@
 /idl/mpeg
 /idl/png
 /idl/png2
-/src/*.o
-/src/*.mod
+test_*
 /src/bin
