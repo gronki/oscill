@@ -2,7 +2,9 @@
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    render = 1
+
+    render = 0
+    pref = 'norm'
 
 
     pref = 'stat'
@@ -10,16 +12,17 @@
     hbar = 1.
 
 
-    a = 25.
-	x0 = -a/6.
-    s = 0.02*a
-    p = hbar*m*0.004
+    a = 1.
+	x0 = 0
+    s = 0.01
+    p = m * 45
 
 
     fps = 24
-    nrefl = 0.04
-    refltime = 10000.
-    rang_corr = 0.5
+    nrefl = 10
+    refltime = 18
+    rang_corr = 1.
+
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -33,8 +36,8 @@
     device, decomp=1
 
 
-    nstat = round(max([80,4*p*a / (hbar*!pi)]))
-    npoints = 8*nstat
+    nstat = round(max([300,4*p*a / (hbar*!pi)]))*4
+    npoints = 2*nstat
 
     x = (dindgen(npoints)/(npoints-1.) - 0.5)*a
     dx = x(1) - x(0)
@@ -43,6 +46,9 @@
     j = dcomplex(0,1)
     f = exp(- 0.5 * ( x - x0 ) ^ 2 / s ^ 2) /  sqrt(s*sqrt(!pi) ) $
         * exp( -j * ( x - x0 ) * p / hbar )
+
+	;f = (1 + cos( (4*x/a + 1) * !pi  )  )* ( x lt 0 )
+	;f = f / sqrt(total(abs(f)^2.))
 
     rang = rang_corr * 0.707 * max(abs(f))
 
@@ -54,14 +60,20 @@
     base = dcomplex(0,0) * fltarr(npoints, nstat)
     spec = dcomplex(0,0) * fltarr(nstat)
 
-    ; window, 3, xs=1600, ys=900
-    ; plot,x,y,yr=[-10,10]
 
     for n=1l, nstat do begin
         base(*,n-1) = sin(!pi*n*(x/a+0.5)) * sqrt(2./a)
         spec(n-1) = total(base(*,n-1)*f)*dx
-        ; print, n, total(abs(base(*,n-1))^2.)*dx, total(abs(f)^2.)*dx
+		q = total(abs(spec(0:n-1))^2.)
+        print, n, q
+		if abs(q-1.) lt 1e-9 then begin
+			nstat = n
+			break
+		endif
     endfor
+
+	base = base(*,0:nstat-1)
+	spec = spec(0:nstat-1)
 
     n = findgen(nstat)+1
     pn = hbar * n * !pi / a
@@ -81,7 +93,7 @@
         device, decomp = 1
     endelse
 
-    if render eq 0 then fps=fps/2
+    if render eq 0 then fps=fps/3.
 
     tscal = a * m / (p > (hbar*!pi/a) )
     tmax = nrefl * tscal
