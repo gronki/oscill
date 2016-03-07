@@ -3,25 +3,24 @@
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    render = 0
-    pref = 'norm'
+    render = 1
 
 
-    pref = 'stat'
-    m = 5.
+    pref = 'stat6'
+    m = 1.
     hbar = 1.
 
 
     a = 1.
-	x0 = 0
-    s = 0.01
-    p = m * 45
+	x0 = -a/6.
+    s = 0.05
+    p = m * 0
 
 
     fps = 24
-    nrefl = 10
-    refltime = 18
-    rang_corr = 1.
+    nrefl = 3
+    refltime = 48
+    rang_corr = 0.9
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -48,7 +47,7 @@
         * exp( -j * ( x - x0 ) * p / hbar )
 
 	;f = (1 + cos( (4*x/a + 1) * !pi  )  )* ( x lt 0 )
-	;f = f / sqrt(total(abs(f)^2.))
+	f = f / sqrt(total(abs(f)^2.)*dx)
 
     rang = rang_corr * 0.707 * max(abs(f))
 
@@ -66,7 +65,7 @@
         spec(n-1) = total(base(*,n-1)*f)*dx
 		q = total(abs(spec(0:n-1))^2.)
         print, n, q
-		if abs(q-1.) lt 1e-9 then begin
+		if abs(q-1.) lt 1e-8 then begin
 			nstat = n
 			break
 		endif
